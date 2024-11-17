@@ -1,6 +1,6 @@
 spring:
   applitation:
-    name: M1-Simulation
+    name: M3-Request
   cloud:
     config:
       enabled: true

@@ -1,6 +1,6 @@
 spring:
   applitation:
-    name: register-service
+    name: M2-Register
   cloud:
     config:
       enabled: true
