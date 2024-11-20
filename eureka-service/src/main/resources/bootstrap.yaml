@@ -1,0 +1,13 @@
+spring:
+  profiles:
+    active: default
+  application:
+    name: eureka-service
+  cloud:
+    config:
+      enabled: true
+      uri: http://localhost:8090
+logging:
+  level:
+    root: DEBUG
+    org.springframework: DEBUG
