@@ -9,10 +9,10 @@
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
 	<groupId>com.example</groupId>
-	<artifactId>gateway-service</artifactId>
+	<artifactId>gateway-server</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-	<name>gateway-service</name>
-	<description>Microservicio que redirige las solicitudes http</description>
+	<name>gateway-server</name>
+	<description>Redirigir las solicitudes http</description>
 	<url/>
 	<licenses>
 		<license/>
@@ -63,7 +63,12 @@
 			<artifactId>spring-boot-starter-test</artifactId>
 			<scope>test</scope>
 		</dependency>
-	</dependencies>
+        <dependency>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-netflix-eureka-client</artifactId>
+            <version>3.0.3</version>
+        </dependency>
+    </dependencies>
 	<dependencyManagement>
 		<dependencies>
 			<dependency>
