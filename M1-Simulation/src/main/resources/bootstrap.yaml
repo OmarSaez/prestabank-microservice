@@ -1,14 +1,16 @@
 spring:
-  applitation:
+  application:
     name: M1-Simulation
   cloud:
     config:
       enabled: true
       uri: http://localhost:8090
-    datasource:
-      url: jdbc:mysql://${DB_HOST}:3306/dbtingeso
-      username: root
-      password: mysql
-    jpa:
-      hibernate:
-        ddl-auto: update
+  datasource:
+    url: jdbc:mysql://localhost:3306/dbtingeso
+    username: root
+    password: mysql
+  jpa:
+    hibernate:
+      ddl-auto: update
+  jmx:
+    enabled: false
