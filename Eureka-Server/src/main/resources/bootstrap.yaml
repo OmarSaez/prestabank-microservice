@@ -5,3 +5,9 @@ spring:
     config:
       enabled: true
       uri: http://localhost:8090
+
+logging:
+  level:
+    com.netflix.eureka: DEBUG
+    com.netflix.discovery: DEBUG
+
