@@ -1,4 +1,4 @@
-package com.example.M1_Simulation;
+package com.example.m1_simulation;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;

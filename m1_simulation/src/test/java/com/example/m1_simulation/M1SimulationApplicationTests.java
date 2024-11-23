@@ -1,4 +1,4 @@
-package com.example.M1_Simulation;
+package com.example.m1_simulation;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
