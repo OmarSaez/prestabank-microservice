@@ -12,16 +12,8 @@ spring:
       discovery:
         locator:
           enabled: true
-        default-filters:
-          - DedupeResponseHeader=Access-Control-Allow-Origin Access-Control-Allow-Credentials, RETAIN_UNIQUE
-      globalcors:
-        cors-configurations:
-          '[/**]':
-            allowedOrigins: '*'
-            allowedMethods: "*"
-            allowedHeaders: "*"
       routes:
-        - id: student-service
-          uri: lb://student-service
+        - id: m1_simulation
+          uri: lb://m1_simulation
           predicates:
-            - Path=/student/**
+            - Path=/simulation/**
