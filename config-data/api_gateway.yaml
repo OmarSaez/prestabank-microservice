@@ -16,4 +16,4 @@ spring:
         - id: m1_simulation
           uri: lb://m1_simulation
           predicates:
-            - Path=/simulation/**
+            - Path=/api/loan/simulate/**
