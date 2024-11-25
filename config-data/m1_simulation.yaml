@@ -1,6 +1,5 @@
 server:
-  port: ${PORT:${SERVER_PORT:0}}
-eureka:
+  port: 8095
   client:
     fetch-registry: true
     register-with-eureka: true
