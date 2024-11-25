@@ -14,6 +14,6 @@ spring:
           enabled: true
       routes:
         - id: m1_simulation_router
-          uri: lb://M1_SIMULATION
+          uri: lb://SIMULATION
           predicates:
             - Path=/api/loan/simulate**
