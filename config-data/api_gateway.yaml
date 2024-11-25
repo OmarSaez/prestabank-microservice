@@ -1,11 +1,13 @@
 server:
   port: 8050
+
 eureka:
   client:
     fetch-registry: true
     register-with-eureka: true
     service-url:
       defaultZone: http://localhost:8761/eureka/
+
 spring:
   cloud:
     gateway:
@@ -17,3 +19,12 @@ spring:
           uri: lb://SIMULATION
           predicates:
             - Path=/api/loan/simulate**
+      
+      # Configuración CORS global
+      globalcors:
+        cors-configurations:
+          '[/**]':  # Esto aplica CORS para todas las rutas
+            allowedOrigins: "*"  # Permite todas las fuentes de origen
+            allowedMethods: "*"  # Permite todos los métodos HTTP (GET, POST, PUT, DELETE, etc.)
+            allowedHeaders: "*"  # Permite todos los encabezados en la solicitud
+            allowedCredentials: true  # Si utilizas cookies o autenticación con credenciales
