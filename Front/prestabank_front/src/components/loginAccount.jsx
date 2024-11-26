@@ -59,12 +59,10 @@ const LoginAccount = () => {
             </Box> 
 
             <Box
-                component="form"
-                onSubmit={handleLogin} // Maneja el envío del formulario
                 sx={{ '& > :not(style)': { m: 1, width: '24ch' } }}
                 noValidate
                 autoComplete="off"
-            >   
+            >
                 <TextField
                     id="input-password"
                     label="Contraseña"
@@ -77,7 +75,7 @@ const LoginAccount = () => {
                 <br />
                 <Button 
                     variant="contained" 
-                    type="submit" // Envía el formulario
+                    onClick={handleLogin} // Ahora maneja el clic del botón
                     sx={{ mt: 2 }} // Añade un margen superior para separación
                 >
                     Iniciar sesión
@@ -85,13 +83,13 @@ const LoginAccount = () => {
 
                 <Button 
                     variant="contained" 
-                    onClick={enterAccount}
-                    type="button" // Este botón no debe enviar el formulario
+                    onClick={enterAccount} // Maneja el clic para "Volver"
                     sx={{ mt: 2 }} // Añade un margen superior para separación
                 >
                     Volver
                 </Button>
             </Box>
+
         </div>
     );
 }

@@ -9,10 +9,17 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 @RestController
 @RequestMapping("/api/user")
 @CrossOrigin("*")
 public class UserController {
+
+    private static final Logger logger = LoggerFactory.getLogger(UserController.class); //MEnsaje por cosnla
+
+
     @Autowired
     UserService userService;
     //Rescatar todos los usuarios
@@ -31,6 +38,7 @@ public class UserController {
     //Rescatar un usuario por su correo
     @GetMapping("/with/{email}")
     public ResponseEntity<UserEntity> getUserByEmail(@PathVariable String email){
+        logger.info("--Se entro al controlador con: {}", email);
         UserEntity user = userService.getUserByEmail(email);
         return ResponseEntity.ok(user);
     }
