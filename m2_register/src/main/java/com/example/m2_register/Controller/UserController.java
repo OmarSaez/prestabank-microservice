@@ -38,7 +38,6 @@ public class UserController {
     //Rescatar un usuario por su correo
     @GetMapping("/with/{email}")
     public ResponseEntity<UserEntity> getUserByEmail(@PathVariable String email){
-        logger.info("--Se entro al controlador con: {}", email);
         UserEntity user = userService.getUserByEmail(email);
         return ResponseEntity.ok(user);
     }

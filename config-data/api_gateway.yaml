@@ -23,12 +23,16 @@ spring:
           uri: lb://REGISTER
           predicates:
             - Path=/api/user/**
-      
-      # Configuración CORS global
+
+      httpclient:
+        connect-timeout: 5000
+        response-timeout: 10000
+
       globalcors:
         cors-configurations:
-          '[/**]':  # Esto aplica CORS para todas las rutas
-            allowedOrigins: "*"  # Permite todas las fuentes de origen
-            allowedMethods: "*"  # Permite todos los métodos HTTP (GET, POST, PUT, DELETE, etc.)
-            allowedHeaders: "*"  # Permite todos los encabezados en la solicitud
-            allowedCredentials: true  # Si utilizas cookies o autenticación con credenciales
+          '[/**]':
+            allowedOrigins: "http://localhost:5173"
+            allowedMethods: "*"
+            allowedHeaders: "*"
+            allowCredentials: true
+
