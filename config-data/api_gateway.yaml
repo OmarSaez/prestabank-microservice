@@ -19,6 +19,10 @@ spring:
           uri: lb://SIMULATION
           predicates:
             - Path=/api/loan/simulate**
+        - id: m2_register_router
+          uri: lb://REGISTER
+          predicates:
+            - Path=/api/user**
       
       # Configuración CORS global
       globalcors:
