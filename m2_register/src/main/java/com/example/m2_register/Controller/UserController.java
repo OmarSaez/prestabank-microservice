@@ -14,7 +14,6 @@ import org.slf4j.LoggerFactory;
 
 @RestController
 @RequestMapping("/api/user")
-@CrossOrigin("*")
 public class UserController {
 
     private static final Logger logger = LoggerFactory.getLogger(UserController.class); //MEnsaje por cosnla

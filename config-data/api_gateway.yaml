@@ -23,6 +23,14 @@ spring:
           uri: lb://REGISTER
           predicates:
             - Path=/api/user/**
+        - id: m3_request_router
+          uri: lb://REQUEST
+          predicates:
+            - Path=/api/loan/**
+        - id: m4_evaluation_router
+          uri: lb://EVALUATION
+          predicates:
+            - Path=/api/evaluation/**
 
       httpclient:
         connect-timeout: 5000
