@@ -40,17 +40,18 @@ public class EvaluationController {
         return ResponseEntity.ok(evaluationService.yearOld(idUser));
     }
 
-    // Requisito 7: Evaluar la capacidad de ahorro
-    @PostMapping("/r7")
+    // Requisito 7: Evaluar la capacidad de ahorro (todos los parámetros como @RequestParam)
+    @GetMapping("/r7")
     public ResponseEntity<List<Integer>> getR7SavingSkills(
             @RequestParam int income,
             @RequestParam double loanAmount,
             @RequestParam int accountYears,
-            @RequestBody ArrayList<Integer> balanceLast12,
-            @RequestBody ArrayList<Integer> bankDeposit,
-            @RequestBody ArrayList<Integer> withdrawals) {
-        return ResponseEntity.ok(
-                evaluationService.savingSkills(income, loanAmount, accountYears, balanceLast12, bankDeposit, withdrawals)
-        );
+            @RequestParam ArrayList<Integer> balanceLast12,
+            @RequestParam ArrayList<Integer> bankDeposit,
+            @RequestParam ArrayList<Integer> withdrawals) {
+
+        List<Integer> result = evaluationService.savingSkills(income, loanAmount, accountYears, balanceLast12, bankDeposit, withdrawals);
+        return ResponseEntity.ok(result);
     }
+
 }

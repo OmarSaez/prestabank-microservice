@@ -1,8 +1,11 @@
 package com.example.m3_request.Service;
 
+import com.example.m3_request.Config.RestTemplateConfig;
 import com.example.m3_request.Entity.LoanEntity;
 import com.example.m3_request.Repository.LoanRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -10,6 +13,7 @@ import java.time.Period;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -20,6 +24,9 @@ public class LoanService {
 
     @Autowired
     LoanRepository loanRepository;
+
+    @Autowired
+    RestTemplateConfig restTemplateConfig;
 
     private static final Logger logger = LoggerFactory.getLogger(LoanService.class); //MEnsaje por cosnla
 
@@ -37,31 +44,53 @@ public class LoanService {
     //Guardar un prestamo todo bien
     public LoanEntity saveLoan(LoanEntity saveLoan) {
 
-        saveLoan.setIngesurce(insurance(saveLoan.getLoanAmount()));
-        saveLoan.setCommission(commission(saveLoan.getLoanAmount()));
-        saveLoan.setTotalCost(totalCost(saveLoan.getLoanAmount(), saveLoan.getIngesurce(), saveLoan.getCommission()));
+        String urlInsurance = "http://TOTALCOST/api/totalcost/insurance?loanAmount=" + saveLoan.getLoanAmount();
+        ResponseEntity<Double> response = restTemplateConfig.restTemplate().getForEntity(urlInsurance, Double.class);
+        double insurance = response.getBody();
+        saveLoan.setIngesurce(insurance);
 
-        saveLoan.setMonthlyInteresRate(saveLoan.getYearInterest()/12/100);
-        saveLoan.setTotalPayments(saveLoan.getMaxDuration()*12);
+        String urlCommission = "http://TOTALCOST/api/totalcost/commission?loanAmount=" + saveLoan.getLoanAmount();
+        ResponseEntity<Double> response1 = restTemplateConfig.restTemplate().getForEntity(urlCommission, Double.class);
+        double commission = response1.getBody();
+        saveLoan.setCommission(commission);
+
+        String urlTotalCost = "http://TOTALCOST/api/totalcost/total?loanAmount=" + saveLoan.getLoanAmount() + "&insurance=" + saveLoan.getIngesurce() + "&commission=" + saveLoan.getCommission();
+        ResponseEntity<Double> response2 = restTemplateConfig.restTemplate().getForEntity(urlTotalCost, Double.class);
+        saveLoan.setTotalCost(response2.getBody());
+
+        saveLoan.setMonthlyInteresRate(saveLoan.getYearInterest() / 12 / 100);
+        saveLoan.setTotalPayments(saveLoan.getMaxDuration() * 12);
 
         Double CalculeMonthlyPayment = Calculo(saveLoan);
         saveLoan.setMonthlyPayment(CalculeMonthlyPayment);
 
-        int EvalueWithR1 = paymentToIncome(saveLoan);
+        //Se solicita evaluar R1
+        String urlR1 = "http://EVALUATION/api/evaluation/r1?income=" + saveLoan.getIncome() + "&monthlyPayment=" + saveLoan.getMonthlyPayment();
+        ResponseEntity<Integer> response3 = restTemplateConfig.restTemplate().getForEntity(urlR1, Integer.class);
+        int EvalueWithR1 = response3.getBody();
 
         //R2 no se puede evaluar automaticamente
 
-        int EvalueWithR3 = seniority(saveLoan);
+        //Se solicita evaluar R3
+        String urlr3 = "http://EVALUATION/api/evaluation/r2?idUser=" + saveLoan.getIdUser();
+        ResponseEntity<Integer> response4 = restTemplateConfig.restTemplate().getForEntity(urlr3, Integer.class);
+        int EvalueWithR3 = response4.getBody();
 
-        int EvalueWithR4 = debtToIncome(saveLoan);
+        //Se solicita evaluar R4
+        String urlr4 = "http://EVALUATION/api/evaluation/r4?income=" + saveLoan.getIncome() + "&totalDebt=" + saveLoan.getTotaldebt() + "&monthlyPayment=" + saveLoan.getMonthlyPayment();
+        ResponseEntity<Integer> response5 = restTemplateConfig.restTemplate().getForEntity(urlr4, Integer.class);
+        int EvalueWithR4 = response5.getBody();
 
         //R5 es tabla, se verifica en front, asi que siempre sera aprobado
 
-        int EvalueWithR6 = yearOld(saveLoan);
+        //Se solicita evaluar R6
+        String urlr6 = "http://EVALUATION/api/evaluation/r6?idUser=" + saveLoan.getIdUser();
+        ResponseEntity<Integer> response6 = restTemplateConfig.restTemplate().getForEntity(urlr6, Integer.class);
+        int EvalueWithR6 = response6.getBody();
 
         //La primera vez que se guarda, no se puede ingresar los datos necesarios para usar la funcion R7, son datos proporcionador por el evaluador (ejecutivo), se pone R7=2 de pendiente
 
-        ArrayList <Integer> newEvalue = new ArrayList<>(Arrays.asList(EvalueWithR1, 2, EvalueWithR3, EvalueWithR4, 1, EvalueWithR6, 2));
+        ArrayList<Integer> newEvalue = new ArrayList<>(Arrays.asList(EvalueWithR1, 2, EvalueWithR3, EvalueWithR4, 1, EvalueWithR6, 2));
 
         saveLoan.setEvalue(newEvalue);
 
@@ -92,30 +121,53 @@ public class LoanService {
     //Modificar un prestamo todo bien
     public LoanEntity updateLoan(LoanEntity changeLoan) {
 
-        changeLoan.setIngesurce(insurance(changeLoan.getLoanAmount()));
-        changeLoan.setCommission(commission(changeLoan.getLoanAmount()));
-        changeLoan.setTotalCost(totalCost(changeLoan.getLoanAmount(), changeLoan.getIngesurce(), changeLoan.getCommission()));
+        String urlInsurance = "http://TOTALCOST/api/totalcost/insurance?loanAmount=" + changeLoan.getLoanAmount();
+        ResponseEntity<Double> response = restTemplateConfig.restTemplate().getForEntity(urlInsurance, Double.class);
+        double insurance = response.getBody();
+        changeLoan.setIngesurce(insurance);
 
+        String urlCommission = "http://TOTALCOST/api/totalcost/commission?loanAmount=" + changeLoan.getLoanAmount();
+        ResponseEntity<Double> response1 = restTemplateConfig.restTemplate().getForEntity(urlCommission, Double.class);
+        double commission = response1.getBody();
+        changeLoan.setCommission(commission);
 
-        changeLoan.setMonthlyInteresRate(changeLoan.getYearInterest()/12/100);
-        changeLoan.setTotalPayments(changeLoan.getMaxDuration()*12);
-        changeLoan.setMonthlyPayment(Calculo(changeLoan));
+        String urlTotalCost = "http://TOTALCOST/api/totalcost/total?loanAmount=" + changeLoan.getLoanAmount() + "&insurance=" + changeLoan.getIngesurce() + "&commission=" + changeLoan.getCommission();
+        ResponseEntity<Double> response2 = restTemplateConfig.restTemplate().getForEntity(urlTotalCost, Double.class);
+        changeLoan.setTotalCost(response2.getBody());
 
-        int EvalueWithR1 = paymentToIncome(changeLoan);
+        changeLoan.setMonthlyInteresRate(changeLoan.getYearInterest() / 12 / 100);
+        changeLoan.setTotalPayments(changeLoan.getMaxDuration() * 12);
+
+        Double CalculeMonthlyPayment = Calculo(changeLoan);
+        changeLoan.setMonthlyPayment(CalculeMonthlyPayment);
+
+        //Se solicita evaluar R1
+        String urlR1 = "http://EVALUATION/api/evaluation/r1?income=" + changeLoan.getIncome() + "&monthlyPayment=" + changeLoan.getMonthlyPayment();
+        ResponseEntity<Integer> response3 = restTemplateConfig.restTemplate().getForEntity(urlR1, Integer.class);
+        int EvalueWithR1 = response3.getBody();
 
         //R2 no se puede evaluar automaticamente
 
-        int EvalueWithR3 = seniority(changeLoan);
+        //Se solicita evaluar R3
+        String urlr3 = "http://EVALUATION/api/evaluation/r2?idUser=" + changeLoan.getIdUser();
+        ResponseEntity<Integer> response4 = restTemplateConfig.restTemplate().getForEntity(urlr3, Integer.class);
+        int EvalueWithR3 = response4.getBody();
 
-        int EvalueWithR4 = debtToIncome(changeLoan);
+        //Se solicita evaluar R4
+        String urlr4 = "http://EVALUATION/api/evaluation/r4?income=" + changeLoan.getIncome() + "&totalDebt=" + changeLoan.getTotaldebt() + "&monthlyPayment=" + changeLoan.getMonthlyPayment();
+        ResponseEntity<Integer> response5 = restTemplateConfig.restTemplate().getForEntity(urlr4, Integer.class);
+        int EvalueWithR4 = response5.getBody();
 
-        //R5 es tabla, no se verifica aca
+        //R5 es tabla, se verifica en front, asi que siempre sera aprobado
 
-        int EvalueWithR6 = yearOld(changeLoan);
+        //Se solicita evaluar R6
+        String urlr6 = "http://EVALUATION/api/evaluation/r6?idUser=" + changeLoan.getIdUser();
+        ResponseEntity<Integer> response6 = restTemplateConfig.restTemplate().getForEntity(urlr6, Integer.class);
+        int EvalueWithR6 = response6.getBody();
 
         //La primera vez que se guarda, no se puede ingresar los datos necesarios para usar la funcion R7, son datos proporcionador por el evaluador (ejecutivo), se pone R7=2 de pendiente
 
-        ArrayList <Integer> newEvalue = new ArrayList<>(Arrays.asList(EvalueWithR1, changeLoan.getEvalue().get(1), EvalueWithR3, EvalueWithR4, 1, EvalueWithR6, 2));
+        ArrayList<Integer> newEvalue = new ArrayList<>(Arrays.asList(EvalueWithR1, changeLoan.getEvalue().get(1), EvalueWithR3, EvalueWithR4, 1, EvalueWithR6, 2));
         changeLoan.setEvalue(newEvalue);
 
         return loanRepository.save(changeLoan);
@@ -126,49 +178,83 @@ public class LoanService {
         logger.info("--Modificador de ejecutivo");
         logger.info("--Balance12: {}", balanceLast12);
 
-        changeLoan.setIngesurce(insurance(changeLoan.getLoanAmount()));
-        changeLoan.setCommission(commission(changeLoan.getLoanAmount()));
-        changeLoan.setTotalCost(totalCost(changeLoan.getLoanAmount(), changeLoan.getIngesurce(), changeLoan.getCommission()));
-
+        //Se calcula los depositos realizados y los retiros
         ArrayList<Integer> bankDeposit = new ArrayList<>(); //se inicia la lista de despositos
         ArrayList<Integer> withdrawals = new ArrayList<>();// se inicia la lista de retiros
 
         bankDeposit.add(1);
         withdrawals.add(0);
         int evalue = 0;
-        for (int i = 1; i < balanceLast12.size(); i++){
-            evalue = balanceLast12.get(i)-balanceLast12.get(i-1); //mes actual menos el mes anterior
-            if (evalue >= 0){//Se es mayor que cero, se deposito
+        for (int i = 1; i < balanceLast12.size(); i++) {
+            evalue = balanceLast12.get(i) - balanceLast12.get(i - 1); //mes actual menos el mes anterior
+            if (evalue >= 0) {//Se es mayor que cero, se deposito
                 bankDeposit.add(evalue);
                 withdrawals.add(0);
-            }else{//Si es negativo entonces se retiro dinero
+            } else {//Si es negativo entonces se retiro dinero
                 bankDeposit.add(0);
-                withdrawals.add(evalue*(-1));
+                withdrawals.add(evalue * (-1));
             }
 
         }
         logger.info("--retiros: {}", withdrawals);
         logger.info("--depositos: {}", bankDeposit);
 
-        //Re calculo de la cuota
-        changeLoan.setMonthlyInteresRate(changeLoan.getYearInterest()/12/100);
-        changeLoan.setTotalPayments(changeLoan.getMaxDuration()*12);
-        changeLoan.setMonthlyPayment(Calculo(changeLoan));
+        //Se calcula los costos del credito
+        String urlInsurance = "http://TOTALCOST/api/totalcost/insurance?loanAmount=" + changeLoan.getLoanAmount();
+        ResponseEntity<Double> response = restTemplateConfig.restTemplate().getForEntity(urlInsurance, Double.class);
+        double insurance = response.getBody();
+        changeLoan.setIngesurce(insurance);
 
-        //Evaluacion del prestamo
-        int EvalueWithR1 = paymentToIncome(changeLoan);
+        String urlCommission = "http://TOTALCOST/api/totalcost/commission?loanAmount=" + changeLoan.getLoanAmount();
+        ResponseEntity<Double> response1 = restTemplateConfig.restTemplate().getForEntity(urlCommission, Double.class);
+        double commission = response1.getBody();
+        changeLoan.setCommission(commission);
+
+        String urlTotalCost = "http://TOTALCOST/api/totalcost/total?loanAmount=" + changeLoan.getLoanAmount() + "&insurance=" + changeLoan.getIngesurce() + "&commission=" + changeLoan.getCommission();
+        ResponseEntity<Double> response2 = restTemplateConfig.restTemplate().getForEntity(urlTotalCost, Double.class);
+        changeLoan.setTotalCost(response2.getBody());
+
+        changeLoan.setMonthlyInteresRate(changeLoan.getYearInterest() / 12 / 100);
+        changeLoan.setTotalPayments(changeLoan.getMaxDuration() * 12);
+
+        Double CalculeMonthlyPayment = Calculo(changeLoan);
+        changeLoan.setMonthlyPayment(CalculeMonthlyPayment);
+
+        //Se solicita evaluar R1
+        String urlR1 = "http://EVALUATION/api/evaluation/r1?income=" + changeLoan.getIncome() + "&monthlyPayment=" + changeLoan.getMonthlyPayment();
+        ResponseEntity<Integer> response3 = restTemplateConfig.restTemplate().getForEntity(urlR1, Integer.class);
+        int EvalueWithR1 = response3.getBody();
 
         //R2 no se puede evaluar automaticamente
 
-        int EvalueWithR3 = seniority(changeLoan);
+        //Se solicita evaluar R3
+        String urlr3 = "http://EVALUATION/api/evaluation/r3?idUser=" + changeLoan.getIdUser();
+        ResponseEntity<Integer> response4 = restTemplateConfig.restTemplate().getForEntity(urlr3, Integer.class);
+        int EvalueWithR3 = response4.getBody();
 
-        int EvalueWithR4 = debtToIncome(changeLoan);
+        //Se solicita evaluar R4
+        String urlr4 = "http://EVALUATION/api/evaluation/r4?income=" + changeLoan.getIncome() + "&totalDebt=" + changeLoan.getTotaldebt() + "&monthlyPayment=" + changeLoan.getMonthlyPayment();
+        ResponseEntity<Integer> response5 = restTemplateConfig.restTemplate().getForEntity(urlr4, Integer.class);
+        int EvalueWithR4 = response5.getBody();
 
-        //R5 es tabla, no se verifica aca
+        //R5 es tabla, se verifica en front, asi que siempre sera aprobado
 
-        int EvalueWithR6 = yearOld(changeLoan);
+        //Se solicita evaluar R6
+        String urlr6 = "http://EVALUATION/api/evaluation/r6?idUser=" + changeLoan.getIdUser();
+        ResponseEntity<Integer> response6 = restTemplateConfig.restTemplate().getForEntity(urlr6, Integer.class);
+        int EvalueWithR6 = response6.getBody();
 
-        ArrayList<Integer> saving = savingSkills(changeLoan, acountYears, balanceLast12, bankDeposit, withdrawals);
+        //Se solicita evaluar R7
+        String url7 = "http://EVALUATION/api/evaluation/r7?income=" + changeLoan.getIncome()
+                + "&loanAmount=" + changeLoan.getLoanAmount()
+                + "&accountYears=" + acountYears
+                + "&balanceLast12=" + String.join(",", balanceLast12.stream().map(String::valueOf).toArray(String[]::new))
+                + "&bankDeposit=" + String.join(",", bankDeposit.stream().map(String::valueOf).toArray(String[]::new))
+                + "&withdrawals=" + String.join(",", withdrawals.stream().map(String::valueOf).toArray(String[]::new));
+        ResponseEntity<ArrayList<Integer>> response7 = restTemplateConfig.restTemplate().exchange(
+                url7, HttpMethod.GET, null, (Class<ArrayList<Integer>>) (Object) ArrayList.class);
+        ArrayList<Integer> saving = response7.getBody();
+
         changeLoan.setSaving(saving);
         logger.info("Lista de la evaluacion de ahorro: {}", saving);
         int acum = 0;
@@ -179,10 +265,18 @@ public class LoanService {
 
         int EvalueWithR7 = 2;
 
-        if (acum >= 5){EvalueWithR7 = 1;}
-        if (acum == 4){EvalueWithR7 = 3;}
-        if (acum == 3){EvalueWithR7 = 3;}
-        if (acum < 3){EvalueWithR7 = 0;}
+        if (acum >= 5) {
+            EvalueWithR7 = 1;
+        }
+        if (acum == 4) {
+            EvalueWithR7 = 3;
+        }
+        if (acum == 3) {
+            EvalueWithR7 = 3;
+        }
+        if (acum < 3) {
+            EvalueWithR7 = 0;
+        }
 
         ArrayList<Integer> newEvalue = new ArrayList<>(Arrays.asList(EvalueWithR1, changeLoan.getEvalue().get(1), EvalueWithR3, EvalueWithR4, 1, EvalueWithR6, EvalueWithR7));
         changeLoan.setEvalue(newEvalue);
@@ -218,3 +312,5 @@ public class LoanService {
     public ArrayList<LoanEntity> getLoanByType(int type) {
         return (ArrayList<LoanEntity>) loanRepository.findByType(type);
     }
+
+}
