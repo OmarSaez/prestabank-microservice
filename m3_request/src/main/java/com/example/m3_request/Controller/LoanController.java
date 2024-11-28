@@ -14,7 +14,6 @@ import org.slf4j.LoggerFactory;
 
 @RestController
 @RequestMapping("/api/loan")
-@CrossOrigin("*")
 public class LoanController {
     @Autowired
     LoanService loanService;

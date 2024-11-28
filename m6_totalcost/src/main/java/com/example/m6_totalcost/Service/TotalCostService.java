@@ -1,5 +1,8 @@
 package com.example.m6_totalcost.Service;
 
+import org.springframework.stereotype.Service;
+
+@Service
 public class TotalCostService {
 
     public double insurance(double loanAmount){

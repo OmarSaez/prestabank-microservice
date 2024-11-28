@@ -72,7 +72,7 @@ public class LoanService {
         //R2 no se puede evaluar automaticamente
 
         //Se solicita evaluar R3
-        String urlr3 = "http://EVALUATION/api/evaluation/r2?idUser=" + saveLoan.getIdUser();
+        String urlr3 = "http://EVALUATION/api/evaluation/r3?veteran=" + saveLoan.getVeteran();
         ResponseEntity<Integer> response4 = restTemplateConfig.restTemplate().getForEntity(urlr3, Integer.class);
         int EvalueWithR3 = response4.getBody();
 
@@ -149,7 +149,7 @@ public class LoanService {
         //R2 no se puede evaluar automaticamente
 
         //Se solicita evaluar R3
-        String urlr3 = "http://EVALUATION/api/evaluation/r2?idUser=" + changeLoan.getIdUser();
+        String urlr3 = "http://EVALUATION/api/evaluation/r3?veteran=" + changeLoan.getVeteran();
         ResponseEntity<Integer> response4 = restTemplateConfig.restTemplate().getForEntity(urlr3, Integer.class);
         int EvalueWithR3 = response4.getBody();
 
@@ -228,7 +228,7 @@ public class LoanService {
         //R2 no se puede evaluar automaticamente
 
         //Se solicita evaluar R3
-        String urlr3 = "http://EVALUATION/api/evaluation/r3?idUser=" + changeLoan.getIdUser();
+        String urlr3 = "http://EVALUATION/api/evaluation/r3?veteran=" + changeLoan.getVeteran();
         ResponseEntity<Integer> response4 = restTemplateConfig.restTemplate().getForEntity(urlr3, Integer.class);
         int EvalueWithR3 = response4.getBody();
 
