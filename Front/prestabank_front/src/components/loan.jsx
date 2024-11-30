@@ -10,6 +10,10 @@ import Dialog from '@mui/material/Dialog';
 import DialogTitle from '@mui/material/DialogTitle';
 import DialogContent from '@mui/material/DialogContent';
 import DialogActions from '@mui/material/DialogActions';
+import { Grid, Card, CardContent, Typography } from "@mui/material";
+import Box from '@mui/material/Box';
+import NavBar from './NavBar';
+
 
 const Loan = () => {
     const navigate = useNavigate();
@@ -140,6 +144,20 @@ const Loan = () => {
         handleCloseRequestR2();
     };
 
+    // Formatea el número con puntos
+    const formatNumber = (value) => {
+        if (!value) return '';
+        const num = value.toString().replace(/\D/g, ''); // Elimina caracteres no numéricos
+        return Number(num).toLocaleString('es-CL'); // Formato para Chile
+    };
+    
+    // Maneja cambios y desformatea antes de guardar
+    const handleBalanceChangeFormatted = (idx, formattedValue) => {
+        const unformattedValue = formattedValue.replace(/\./g, ''); // Elimina puntos
+        handleBalanceChange(idx, unformattedValue); // Llama la función original
+    };
+  
+
     // Función para manejar cambios en el input de años
     const handleAccountYearsChange = (e) => {
         setAccountYears(Number(e.target.value));
@@ -179,184 +197,249 @@ const Loan = () => {
 
     return (
         <div>
-            <h2>Detalles del Crédito</h2>
-            <p>ID Préstamo: {idLoan}</p>
-            <p>ID Usuario: {id}</p>
-
-            {/* Datos user */}
-            <h4>Datos del cliente:</h4>
-            <p>RUT: {userData.rut} &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Nombre y Apellido: {userData.name} {userData.lastName}</p>
-            <p>
-                Ingreso: {new Intl.NumberFormat("es-CL", { style: "decimal", minimumFractionDigits: 0, maximumFractionDigits: 2 }).format(loanData.income)}
-                &nbsp;&nbsp;&nbsp;
-                Antigüedad en trabajo: {loanData.veteran}
-                &nbsp;&nbsp;&nbsp;
-                Deudas: {new Intl.NumberFormat("es-CL", { style: "decimal", minimumFractionDigits: 0, maximumFractionDigits: 2 }).format(loanData.totaldebt)}
-            </p>
-            <p>Fecha de nacimiento: {userData.birthDay}/{userData.birthMonth}/{userData.birthYear}</p>
-
-            {/* Datos solicud */}
-            <h4>Datos de la solicitud:</h4>
-            <p style={{ color: getColor(loanData.status), fontWeight: 'bold'  }}>Estado: {getStatusText(loanData.status)}</p>
-            <p>Tipo de Crédito: {getTypeText(loanData.type)}</p>
-            <p>Valor del prestamo: {new Intl.NumberFormat("es-CL", { style: "decimal", minimumFractionDigits: 0, maximumFractionDigits: 2 }).format(loanData.loanAmount)}</p>
-            <p>Interés Anual: {loanData.yearInterest}&nbsp;&nbsp; 
-            Cuota Mensual:{" "}
-            {new Intl.NumberFormat("es-CL", {
-                style: "decimal",
-                minimumFractionDigits: 0,
-                maximumFractionDigits: 4,
-            }).format(loanData.monthlyPayment)}&nbsp;&nbsp; 
-            Total de Meses: {loanData.totalPayments}</p>
-            
-            <br/>
-            <br/>
-
-            {/* Sección de requisitos */}
-            <h2>Estados de los Requisitos:</h2>
-
-            <h4>Requisito 1: Relación Cuota/Ingreso</h4>
-            <p>La relacion cuota ingreso no debe ser mayor al 35%</p>
-            <p>Estado: {getRequirementStatus(loanData.evalue[0])}</p>
-
-            <h4>Requisito 2: Historial Crediticio del Cliente</h4>
-            <p>Se debe revisar el historial crediticio del cliente en DICOM, esta es una revision manual que debe hacer un ejecutivo</p>
-            <p>Estado: {getRequirementStatus(loanData.evalue[1])}</p>
-
-            <Button 
-                variant="contained" 
-                onClick={handleOpenRequestR2}
-                type="button"
-                sx={{ mt: 2 }}
-            >
-                Cambiar estado
-            </Button>
-
-            <Dialog open={openRequestR2} onClose={handleCloseRequestR2}> {/* Corregido el prop 'open' */}
-                <DialogTitle>Cambiar estado de la solicitud</DialogTitle>
-                <DialogContent>
-                    <Select
-                        value={selectedRequirement}
-                        onChange={(e) => setSelectedRequirement(e.target.value)}
-                        fullWidth
-                    >
-                        <MenuItem value={0}>Rechazado</MenuItem>
-                        <MenuItem value={1}>Cumplido</MenuItem>
-                        <MenuItem value={2}>Pendiente de documentación</MenuItem>
-                        <MenuItem value={3}>Requiere otra revision</MenuItem>
-                    </Select>
-                </DialogContent>
-                <DialogActions>
-                    <Button onClick={handleCloseRequestR2}>Cancelar</Button>
-                    <Button onClick={handleChangeRequestR2}>Guardar</Button>
-                </DialogActions>
-            </Dialog>
-
-            <h4>Requisito 3: Antigüedad Laboral y Estabilidad</h4>
-            <p>Se verifica que el solicitante tenga almenos 2 años en us trabajo actual, no tomar en cuenta el estado si es un independiente ya que no aplica</p>
-            <p>Estado: {getRequirementStatus(loanData.evalue[2])}</p>
-
-            {/* Mensaje de advertencia en texto rojo si el solicitante es independiente */}
-            {loanData.isIndependent === 1 && (
-                <p style={{ color: 'red', fontWeight: 'bold' }}>
-                    Advertencia: El solicitante es independiente. Se debe revisar sus ingresos de los últimos 2 o más años para evaluar su estabilidad financiera.
-                </p>
-            )}
-
-
-            <h4>Requisito 4: Relación Deuda/Ingreso </h4>
-            <p>La relacion entre la deuda incluyendo la proyeccion de la cuota mensual y el ingreso del solicitante no debe ser mayor al 50%</p>
-            <p>Estado: {getRequirementStatus(loanData.evalue[3])}</p>
-
-            <h4>Requisito 5: Monto Máximo de Financiamiento</h4>
-            <p>Estas limitante son controladas al momento que se realiza la solicitud</p>
-            <p>Estado: {getRequirementStatus(loanData.evalue[4])}</p>
-
-            <h4>Requisito 6: Edad del Solicitante </h4>
-            <p>El solicitante no puede tener 70 años o más</p>
-            <p>Estado: {getRequirementStatus(loanData.evalue[5])}</p>
-
-            <h4>Requisito 7: Capacidad de Ahorro</h4>
-            <p>Para calcular los diversos factores y asi evaluar la capacidad de ahorro del solcitante porfavor ingrese los años de la cuenta de ahorro y el saldo de los ultimos 12 meses</p>
-            <p>Estado: {getRequirementStatus(loanData.evalue[6])}</p>
-
-            {/* Campo de entrada para los años de la cuenta de ahorro */}
-            <label>Años de la cuenta de ahorro: </label>
-            <input
-                type="number"
-                value={accountYears}
-                onChange={handleAccountYearsChange}
-                min="0"
-            />
-            <br/>
-            <br/>
-            {/* Campos de entrada para el balance de los últimos 12 meses */}
-            <label>Balance de los últimos 12 meses:</label>
-            <div>
-                {balanceLast12.map((balance, index) => (
-                    <div key={index}>
-                        <label>Mes {index + 1}: </label>
-                        <input
-                            type="number"
-                            value={balance === "" ? "" : balance} 
-                            onChange={(e) => handleBalanceChange(index, e.target.value)}
-                            min="0"
-                        />
-                    </div>
-                ))}
-            </div>
-
-            <br/>
-            {/* Botón para enviar la actualización */}
-            <button onClick={handleSubmit}>Actualizar Requisito de Ahorro</button>
-       
-            <br/>
-            <br/>
-            <Button 
-                variant="contained" 
-                onClick={() => navigate(`/home/${id}`)}
-                type="button"
-                sx={{ mt: 2, mr: 2}}
-            >
-                Volver
-            </Button>
-
-            <Button 
-                variant="contained" 
-                onClick={handleOpen} // Abre el diálogo
-                type="button"
-                sx={{ mt: 2 }}
-            >
-                Cambiar estado de la solicitud
-            </Button>
-
-            <Dialog open={open} onClose={handleClose}>
-                <DialogTitle>Cambiar estado de la solicitud</DialogTitle>
-                <DialogContent>
-                    <Select
-                        value={selectedStatus}
-                        onChange={(e) => setSelectedStatus(e.target.value)}
-                        fullWidth
-                    >
-                        <MenuItem value={1}>Revisión inicial</MenuItem>
-                        <MenuItem value={2}>Pendiente de documentación</MenuItem>
-                        <MenuItem value={3}>En evaluación</MenuItem>
-                        <MenuItem value={4}>Pre-aprobado</MenuItem>
-                        <MenuItem value={5}>Aprobación final</MenuItem>
-                        <MenuItem value={6}>Aprobada</MenuItem>
-                        <MenuItem value={7}>Rechazada</MenuItem>
-                        <MenuItem value={8}>Cancelada por el cliente</MenuItem>
-                        <MenuItem value={9}>En desembolso</MenuItem>
-                    </Select>
-                </DialogContent>
-                <DialogActions>
-                    <Button onClick={handleClose}>Cancelar</Button>
-                    <Button onClick={handleChangeStatus}>Guardar</Button>
-                </DialogActions>
-            </Dialog>
-
+        <NavBar id={id} />
+        <div style={{ padding: "20px" }}>
         </div>
-    );
+          <Box 
+                sx={{ 
+                    backgroundColor: '#1976d2', // Color azul primario de MUI
+                    color: 'white', 
+                    padding: '10px', 
+                    textAlign: 'center', 
+                    width: '100%', 
+                    marginBottom: '20px' 
+                }}
+                >
+                <Typography variant="h6">Detalles del crédito</Typography>
+            </Box>
+      
+          <Grid container spacing={3}>
+            {/* Información del préstamo */}
+            <Grid item xs={12} sm={6}>
+              <Card>
+                <CardContent>
+                  <Typography variant="h6">Datos del Préstamo</Typography>
+                  <Typography>ID Préstamo: {idLoan}</Typography>
+                  <Typography>ID Usuario: {id}</Typography>
+                  <Typography>
+                    Estado: <span style={{ color: getColor(loanData.status) }}>{getStatusText(loanData.status)}</span>
+                  </Typography>
+                  <Typography>Tipo de Crédito: {getTypeText(loanData.type)}</Typography>
+                  <Typography>
+                    Valor del Préstamo:{" "}
+                    {new Intl.NumberFormat("es-CL", {
+                      style: "decimal",
+                      minimumFractionDigits: 0,
+                      maximumFractionDigits: 2,
+                    }).format(loanData.loanAmount)}
+                  </Typography>
+                  <Typography>Interés Anual: {loanData.yearInterest}</Typography>
+                  <Typography>
+                    Cuota Mensual:{" "}
+                    {new Intl.NumberFormat("es-CL", {
+                      style: "decimal",
+                      minimumFractionDigits: 0,
+                      maximumFractionDigits: 2,
+                    }).format(loanData.monthlyPayment)}
+                  </Typography>
+                  <Typography>Total de Meses: {loanData.totalPayments}</Typography>
+                </CardContent>
+              </Card>
+            </Grid>
+      
+            {/* Datos del cliente */}
+            <Grid item xs={12} sm={6}>
+              <Card>
+                <CardContent>
+                    
+                <Typography variant="h6">Datos del Cliente</Typography>
+                  <Typography>RUT: {userData.rut}</Typography>
+                  <Typography>
+                    Nombre y Apellido: {userData.name} {userData.lastName}
+                  </Typography>
+                  <Typography>
+                    Ingreso:{" "}
+                    {new Intl.NumberFormat("es-CL", { style: "decimal", minimumFractionDigits: 0 }).format(loanData.income)}
+                  </Typography>
+                  <Typography>Antigüedad en Trabajo: {loanData.veteran}</Typography>
+                  <Typography>
+                    Deudas:{" "}
+                    {new Intl.NumberFormat("es-CL", { style: "decimal", minimumFractionDigits: 0 }).format(loanData.totaldebt)}
+                  </Typography>
+                  <Typography>
+                    Fecha de Nacimiento: {userData.birthDay}/{userData.birthMonth}/{userData.birthYear}
+                  </Typography>
+                </CardContent>
+              </Card>
+            </Grid>
+          </Grid>
+      
+          {/* Requisitos */}
+          <Box 
+                sx={{ 
+                    backgroundColor: '#1976d2', // Color azul primario de MUI
+                    color: 'white', 
+                    padding: '10px', 
+                    textAlign: 'center', 
+                    width: '100%', 
+                    marginBottom: '20px' 
+                }}
+                >
+                <Typography variant="h6">Estados de los requisitos</Typography>
+            </Box>
+            <Grid container spacing={3}>
+            {loanData.evalue.map((status, index) => (
+                <Grid item xs={12} sm={6} key={index}>
+                <Card>
+                    <CardContent>
+                    <Typography variant="h6">Requisito {index + 1}</Typography>
+                    <Typography>Estado: {getRequirementStatus(status)}</Typography>
+                    
+                    {/* Descripciones de los requisitos */}
+                    {index === 0 && (
+                        <>
+                        <Typography variant="body1">
+                            La relación cuota ingreso no debe ser mayor al 35%.
+                        </Typography>
+                        </>
+                    )}
+                    {index === 1 && (
+                        <>
+                        <Typography variant="body1">
+                            Se debe revisar el historial crediticio del cliente en DICOM, esta es una revisión manual que debe hacer un ejecutivo.
+                        </Typography>
+                        <Button variant="contained" onClick={handleOpenRequestR2} sx={{ mt: 2 }}>Cambiar estado</Button>
+                        <Dialog open={openRequestR2} onClose={handleCloseRequestR2}>
+                            <DialogTitle>Cambiar estado de la solicitud</DialogTitle>
+                            <DialogContent>
+                            <Select value={selectedRequirement} onChange={(e) => setSelectedRequirement(e.target.value)} fullWidth>
+                                <MenuItem value={0}>Rechazado</MenuItem>
+                                <MenuItem value={1}>Cumplido</MenuItem>
+                                <MenuItem value={2}>Pendiente de documentación</MenuItem>
+                                <MenuItem value={3}>Requiere otra revisión</MenuItem>
+                            </Select>
+                            </DialogContent>
+                            <DialogActions>
+                            <Button onClick={handleCloseRequestR2}>Cancelar</Button>
+                            <Button onClick={handleChangeRequestR2}>Guardar</Button>
+                            </DialogActions>
+                        </Dialog>
+                        </>
+                    )}
+                    {index === 2 && (
+                        <>
+                        <Typography variant="body1">
+                            Se verifica que el solicitante tenga al menos 2 años en su trabajo actual. No aplica si es independiente.
+                        </Typography>
+                        {/* Mensaje de advertencia en texto rojo si el solicitante es independiente */}
+                        {loanData.isIndependent === 1 && (
+                            <p style={{ color: 'red', fontWeight: 'bold' }}>
+                                Advertencia: El solicitante es independiente. Se debe revisar sus ingresos de los últimos 2 o más años para evaluar su estabilidad financiera.
+                            </p>
+                        )}
+                        </>
+                    )}
+                    {index === 3 && (
+                        <>
+                        <Typography variant="body1">
+                            La relación entre la deuda, incluyendo la proyección de la cuota mensual, y el ingreso del solicitante no debe ser mayor al 50%.
+                        </Typography>
+                        </>
+                    )}
+                    {index === 4 && (
+                        <>
+                        <Typography variant="body1">
+                            Estas limitantes son controladas al momento que se realiza la solicitud.
+                        </Typography>
+                        </>
+                    )}
+                    {index === 5 && (
+                        <>
+                        <Typography variant="body1">
+                            El solicitante no puede tener 70 años o más.
+                        </Typography>
+                        </>
+                    )}
+                    {index === 6 && (
+                    <>
+                        <Typography variant="body1">
+                        Para evaluar la capacidad de ahorro, ingrese los años de la cuenta de ahorro y el saldo de los últimos 12 meses.
+                        </Typography>
+                        
+                        <label>Años de la cuenta de ahorro: </label>
+                        <input 
+                        type="number" 
+                        value={accountYears} 
+                        onChange={handleAccountYearsChange} 
+                        min="0" 
+                        />
+                        
+                        <br /><br />
+                        
+                        <label>Balance de los últimos 12 meses:</label>
+                        <div>
+                        {balanceLast12.map((balance, idx) => (
+                            <div key={idx}>
+                            <label>Mes {idx + 1}: </label>
+                            <input
+                                type="text" // Cambiado a 'text' para permitir formato
+                                value={formatNumber(balance)} 
+                                onChange={(e) => handleBalanceChangeFormatted(idx, e.target.value)}
+                            />
+                            </div>
+                        ))}
+                        </div>
+                        
+                        <br />
+                        
+                        <Button variant="contained" color="primary" onClick={handleSubmit}>
+                        Actualizar Requisito de Ahorro
+                        </Button>
+                        
+                        <br /><br />
+                    </>
+                    )}
+
+                    </CardContent>
+                </Card>
+                </Grid>
+            ))}
+            </Grid>
+
+      
+          {/* Botones */}
+          <div style={{ textAlign: "center", marginTop: "20px" }}>
+            <Button variant="contained" onClick={() => navigate(`/home/${id}`)} sx={{ marginRight: "10px" }}>
+              Volver
+            </Button>
+            <Button variant="contained" onClick={handleOpen}>
+              Cambiar Estado de la Solicitud
+            </Button>
+          </div>
+      
+          {/* Diálogo para cambiar estado */}
+          <Dialog open={open} onClose={handleClose}>
+            <DialogTitle>Cambiar estado de la solicitud</DialogTitle>
+            <DialogContent>
+              <Select value={selectedStatus} onChange={(e) => setSelectedStatus(e.target.value)} fullWidth>
+                <MenuItem value={1}>Revisión inicial</MenuItem>
+                <MenuItem value={2}>Pendiente de documentación</MenuItem>
+                <MenuItem value={3}>En evaluación</MenuItem>
+                <MenuItem value={4}>Pre-aprobado</MenuItem>
+                <MenuItem value={5}>Aprobación final</MenuItem>
+                <MenuItem value={6}>Aprobada</MenuItem>
+                <MenuItem value={7}>Rechazada</MenuItem>
+                <MenuItem value={8}>Cancelada por el cliente</MenuItem>
+                <MenuItem value={9}>En desembolso</MenuItem>
+              </Select>
+            </DialogContent>
+            <DialogActions>
+              <Button onClick={handleClose}>Cancelar</Button>
+              <Button onClick={handleChangeStatus}>Guardar</Button>
+            </DialogActions>
+          </Dialog>
+        </div>
+      );
 };
 
 export default Loan;
