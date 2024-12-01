@@ -1,14 +1,11 @@
 import * as React from 'react';
 import { useState } from "react";
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import NavBar from './NavBar';
-import { useNavigate } from 'react-router-dom';
 import loanService from '../services/loan.service';
-import Button from '@mui/material/Button'; 
-import { Box, MenuItem, Select, InputLabel, TextField, FormControl, Grid, FormControlLabel, Radio, RadioGroup, FormLabel } from '@mui/material';
+import { Box, MenuItem, Select, InputLabel, TextField, FormControl, Grid, FormControlLabel, Radio, RadioGroup, FormLabel, Button } from '@mui/material';
 
 const ApplyForLoan = () => {
-
     const navigate = useNavigate();
     const { id } = useParams();
 
@@ -20,8 +17,11 @@ const ApplyForLoan = () => {
     const [income, setIncome] = useState('');
     const [veteran, setVeteran] = useState('');
     const [totaldebt, setTotaldebt] = useState('');
-    const [papers, setPapers] = useState(null); // Ahora maneja un archivo
+    const [papers, setPapers] = useState(null);
     const [isIndependent, setIsIndependent] = useState('');
+    const [fileName, setFileName] = useState(''); // Estado para almacenar el nombre del archivo
+
+
 
     const loanTypeLimits = {
         "1": { maxLoanPercentage: 80, maxYears: 30, interestRate: 4.5 },
@@ -38,56 +38,80 @@ const ApplyForLoan = () => {
         setYearInterestRate(loanTypeLimits[selectedType].interestRate);
     };
 
-    const handlePropertyValueChange = (e) => setPropertyValue(e.target.value);
+    const formatNumber = (value) => {
+        const numericValue = value.replace(/\D/g, ''); // Elimina cualquier carácter que no sea un número
+        return numericValue.replace(/\B(?=(\d{3})+(?!\d))/g, '.'); // Aplica el formato con puntos
+    };
+    
+    const handlePropertyValueChange = (e) => {
+        const formattedValue = formatNumber(e.target.value);
+        setPropertyValue(formattedValue);
+    };
     
     const handleRequiredLoanChange = (e) => {
-        const maxLoan = (propertyValue * loanTypeLimits[loanType].maxLoanPercentage) / 100;
-        if (e.target.value <= maxLoan) {
-            setRequiredLoan(e.target.value);
+        const rawValue = e.target.value.replace(/\D/g, ''); // Quitar puntos para comparar valores numéricos
+        const maxLoan = (parseInt(propertyValue.replace(/\./g, '')) * loanTypeLimits[loanType].maxLoanPercentage) / 100;
+        
+        if (parseInt(rawValue) <= maxLoan) {
+            const formattedValue = formatNumber(rawValue);
+            setRequiredLoan(formattedValue);
         } else {
-            alert(`ADVERTENCIA: El préstamo máximo permitido es el ${loanTypeLimits[loanType].maxLoanPercentage}% del valor del inmueble (monto máximo: ${maxLoan})`);
+             alert(`ADVERTENCIA: El préstamo máximo permitido es el ${loanTypeLimits[loanType].maxLoanPercentage}% del valor del inmueble (monto máximo: ${formatNumber((maxLoan).toString())})`);
         }
     };
     
     const handleYearsToPayChange = (e) => {
-        const maxYears = loanTypeLimits[loanType].maxYears;
-        if (e.target.value <= maxYears && e.target.value >= 0) {
-            setYearsToPay(e.target.value);
+        const maxYears = loanTypeLimits[loanType]?.maxYears || 0;
+        const value = e.target.value;
+        if (value <= maxYears && value >= 0) {
+            setYearsToPay(value);
         } else {
             alert(`ADVERTENCIA: El máximo de años permitidos es ${maxYears}`);
         }
     };
 
-    // Manejador para el archivo (para actualizar el estado)
+    const handleIncomeChange = (e) => {
+        const rawValue = e.target.value.replace(/\D/g, ''); // Elimina cualquier carácter no numérico
+        const formattedValue = formatNumber(rawValue); // Aplica el formato con puntos
+        setIncome(formattedValue); // Actualiza el estado con el valor formateado
+    };
+
+    const handleTotalDebtChange = (e) => {
+        const rawValue = e.target.value.replace(/\D/g, ''); // Elimina caracteres no numéricos
+        const formattedValue = formatNumber(rawValue); // Aplica el formato con puntos
+        setTotaldebt(formattedValue); // Actualiza el estado con el valor formateado
+    };
+    
+    
+    
+    
+
     const handleFileChange = (event) => {
         const selectedFile = event.target.files[0];
         if (selectedFile && selectedFile.type === 'application/pdf') {
             setPapers(selectedFile);
+            setFileName(selectedFile.name); // Actualiza el nombre del archivo
         } else {
             alert("Por favor, selecciona un archivo PDF.");
             setPapers(null);
+            setFileName(''); // Limpiar el nombre si el archivo no es válido
         }
     };
-    
-    //Se crea la solicitud a mandar
+
     const handleLoanCreate = async () => {
         const loan = {
             idUser: id,
             type: loanType,
             yearInterest: yearInterestRate,
             maxDuration: yearsToPay,
-            income,
+            income: parseFloat(income.replace(/\./g, '')), // Convertir a número después de eliminar puntos
             veteran,
-            totaldebt,
-            loanAmount: requiredLoan,
+            totaldebt: parseFloat(totaldebt.replace(/\./g, '')), // Convertir a número después de eliminar puntos
+            loanAmount: parseFloat(requiredLoan.replace(/\./g, '')), // Convertir a número después de eliminar puntos
             isIndependent: isIndependent === 'yes' ? 1 : 0,
         };
         
-        console.log("----DATOS QUE SE MANDARAN A LOAN.SERVICE.JS----");
-        console.log("LOAN que se ingreso por el FRONT", loan);// Log oara verificar el loan a madnar
-        console.log("Archivo seleccionado en el FRONT:", papers); // Verificación de que el archivo se seleccionó
-        
-        
+
         try {
             await loanService.create(loan, papers);
             alert("Se mandó la solicitud de crédito");
@@ -97,9 +121,7 @@ const ApplyForLoan = () => {
             alert("Ocurrió un error al intentar mandar el préstamo. Por favor, intenta nuevamente.");
         }
     };
-    
-    
-    
+
     return (
         <div>
             <NavBar id={id} />
@@ -108,7 +130,6 @@ const ApplyForLoan = () => {
             <Box sx={{ '& > :not(style)': { ml: 0, mr: -30, mt: 6, mb: 5 } }}>
                 <Grid container spacing={1}>
                     <FormControl fullWidth margin="normal">
-                        
                     <InputLabel>Tipo de préstamo</InputLabel>
                         <Select value={loanType} onChange={handleLoanTypeChange} label="Tipo de préstamo">
                             <MenuItem value="" disabled>Selecciona el tipo de préstamo</MenuItem>
@@ -120,7 +141,7 @@ const ApplyForLoan = () => {
                         <br/>
 
                         <TextField 
-                            type="number" 
+                            type="text" 
                             value={propertyValue} 
                             onChange={handlePropertyValueChange} 
                             label="Valor del inmueble" 
@@ -129,7 +150,7 @@ const ApplyForLoan = () => {
                         <br/>
 
                         <TextField 
-                            type="number" 
+                            type="text" 
                             value={requiredLoan} 
                             onChange={handleRequiredLoanChange} 
                             label="Préstamo requerido" 
@@ -149,9 +170,9 @@ const ApplyForLoan = () => {
                         <br/>
 
                         <TextField 
-                            type="number" 
+                            type="text" 
                             value={income}  
-                            onChange={(e) => setIncome(e.target.value)} 
+                            onChange={handleIncomeChange} 
                             label="Salario mensual" 
                             placeholder="Ingreso mensual" 
                         />
@@ -167,13 +188,13 @@ const ApplyForLoan = () => {
                         <br/>
 
                         <TextField 
-                            type="number" 
+                            type="text" 
                             value={totaldebt}  
-                            onChange={(e) => setTotaldebt(e.target.value)} 
+                            onChange={handleTotalDebtChange} 
                             label="Total de deudas mensuales" 
                             placeholder="Ingrese el total de deudas que tenga actualmente cada mes" 
                         />
-                        <br/>
+
                         <FormControl component="fieldset">
                             <FormLabel component="legend">¿Eres trabajador independiente?</FormLabel>
                             <RadioGroup row value={isIndependent} onChange={e => setIsIndependent(e.target.value)}>
@@ -182,8 +203,21 @@ const ApplyForLoan = () => {
                             </RadioGroup>
                         </FormControl>
 
-                        <input type="file" accept="application/pdf" onChange={handleFileChange} />
-                        <Button variant="contained" onClick={handleLoanCreate} sx={{ mt: 2 }}>Enviar solicitud de crédito</Button>
+                        <Button variant="outlined" component="label" sx={{ mt: 2 }}>
+                            Cargar comprobante de documentación
+                            <input type="file" hidden accept="application/pdf" onChange={handleFileChange} />
+                        </Button>
+
+                        {/* Mostrar el nombre del archivo cargado si existe */}
+                        {fileName && (
+                            <div style={{ marginTop: '10px' }}>
+                                <strong>Archivo cargado: </strong> {fileName}
+                            </div>
+                        )}
+
+                        <Button variant="contained" onClick={handleLoanCreate} sx={{ mt: 2 }}>
+                            Enviar solicitud de crédito
+                        </Button>
                     </FormControl>
                 </Grid>
             </Box>

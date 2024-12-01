@@ -39,8 +39,8 @@ public class LoanEntity {
     private ArrayList<Integer> saving; //   Puntos de capacidad de ahorro
 
     @Lob
-    @Column(name = "papers")
-    private byte[] papers;  //Se agrega- Documentacion a evaluar manualmente Almacena el archivo PDF
+    @Column(name = "papers", columnDefinition = "LONGBLOB") // Especificamos el tipo LONGBLOB para papers
+    private byte[] papers; // Almacena el archivo PDF de la documentación
 
     private ArrayList<Integer> evalue; //   Listado que indica automaticamente las cosas 0=rechazado, 1=aprobado, 2=pendiente. 3=Requiere otra revision [R1, R2, R3, R4, R6, R7]
 
