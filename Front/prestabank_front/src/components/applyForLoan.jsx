@@ -4,7 +4,6 @@ import { useParams } from 'react-router-dom';
 import NavBar from './NavBar';
 import { useNavigate } from 'react-router-dom';
 import loanService from '../services/loan.service';
-
 import Button from '@mui/material/Button'; 
 import { Box, MenuItem, Select, InputLabel, TextField, FormControl, Grid, FormControlLabel, Radio, RadioGroup, FormLabel } from '@mui/material';
 
@@ -21,8 +20,8 @@ const ApplyForLoan = () => {
     const [income, setIncome] = useState('');
     const [veteran, setVeteran] = useState('');
     const [totaldebt, setTotaldebt] = useState('');
-    const [papers, setPapers] = useState([]);
-    const [isIndependent, setIsIndependent] = useState(''); // Estado para la selección "Sí" o "No"
+    const [papers, setPapers] = useState(null); // Ahora maneja un archivo
+    const [isIndependent, setIsIndependent] = useState('');
 
     const loanTypeLimits = {
         "1": { maxLoanPercentage: 80, maxYears: 30, interestRate: 4.5 },
@@ -40,7 +39,7 @@ const ApplyForLoan = () => {
     };
 
     const handlePropertyValueChange = (e) => setPropertyValue(e.target.value);
-
+    
     const handleRequiredLoanChange = (e) => {
         const maxLoan = (propertyValue * loanTypeLimits[loanType].maxLoanPercentage) / 100;
         if (e.target.value <= maxLoan) {
@@ -49,7 +48,7 @@ const ApplyForLoan = () => {
             alert(`ADVERTENCIA: El préstamo máximo permitido es el ${loanTypeLimits[loanType].maxLoanPercentage}% del valor del inmueble (monto máximo: ${maxLoan})`);
         }
     };
-
+    
     const handleYearsToPayChange = (e) => {
         const maxYears = loanTypeLimits[loanType].maxYears;
         if (e.target.value <= maxYears && e.target.value >= 0) {
@@ -59,32 +58,48 @@ const ApplyForLoan = () => {
         }
     };
 
+    // Manejador para el archivo (para actualizar el estado)
+    const handleFileChange = (event) => {
+        const selectedFile = event.target.files[0];
+        if (selectedFile && selectedFile.type === 'application/pdf') {
+            setPapers(selectedFile);
+        } else {
+            alert("Por favor, selecciona un archivo PDF.");
+            setPapers(null);
+        }
+    };
+    
+    //Se crea la solicitud a mandar
     const handleLoanCreate = async () => {
-        setPapers(['archivosComprobantes.pdf']);
         const loan = {
             idUser: id,
             type: loanType,
             yearInterest: yearInterestRate,
             maxDuration: yearsToPay,
-            income: income,
-            veteran: veteran,
-            totaldebt: totaldebt,
+            income,
+            veteran,
+            totaldebt,
             loanAmount: requiredLoan,
-            isIndependent: isIndependent === 'yes' ? 1 : 0, // Asigna 1 si seleccionó "Sí", de lo contrario, 0
-            papers: papers,
+            isIndependent: isIndependent === 'yes' ? 1 : 0,
         };
+        
+        console.log("----DATOS QUE SE MANDARAN A LOAN.SERVICE.JS----");
+        console.log("LOAN que se ingreso por el FRONT", loan);// Log oara verificar el loan a madnar
+        console.log("Archivo seleccionado en el FRONT:", papers); // Verificación de que el archivo se seleccionó
+        
+        
         try {
-            await loanService.create(loan);
+            await loanService.create(loan, papers);
             alert("Se mandó la solicitud de crédito");
-            console.log("Se creó con éxito la solicitud", loan);
             navigate(`/home/${id}`);
-                
         } catch (error) {
-            console.error("Error al intentar calcular el préstamo:", error);
+            console.error("Error al intentar enviar el préstamo:", error);
             alert("Ocurrió un error al intentar mandar el préstamo. Por favor, intenta nuevamente.");
         }
     };
-
+    
+    
+    
     return (
         <div>
             <NavBar id={id} />
@@ -159,50 +174,19 @@ const ApplyForLoan = () => {
                             placeholder="Ingrese el total de deudas que tenga actualmente cada mes" 
                         />
                         <br/>
-
-                        <TextField 
-                            type="string" 
-                            value={papers}  
-                            onChange={(e) => setPapers[1](e.target.value)} 
-                            label="Comprobantes de salario, deudas, valor del inmueble" 
-                            placeholder="Ingrese un archivo PDF de los comprobantes" 
-                        />
-                        <br/>
-
-                        <FormControl component="fieldset" margin="normal">
+                        <FormControl component="fieldset">
                             <FormLabel component="legend">¿Eres trabajador independiente?</FormLabel>
-                            <RadioGroup
-                                row
-                                value={isIndependent}
-                                onChange={(e) => setIsIndependent(e.target.value)}
-                            >
+                            <RadioGroup row value={isIndependent} onChange={e => setIsIndependent(e.target.value)}>
                                 <FormControlLabel value="yes" control={<Radio />} label="Sí" />
                                 <FormControlLabel value="no" control={<Radio />} label="No" />
                             </RadioGroup>
                         </FormControl>
 
-                        <Button 
-                            variant="contained" 
-                            onClick={handleLoanCreate}
-                            type="button"
-                            sx={{ mt: 2 }}
-                        >
-                            Enviar solicitud de crédito
-                        </Button>
-
+                        <input type="file" accept="application/pdf" onChange={handleFileChange} />
+                        <Button variant="contained" onClick={handleLoanCreate} sx={{ mt: 2 }}>Enviar solicitud de crédito</Button>
                     </FormControl>
-
-                    <Button 
-                        variant="contained" 
-                        onClick={() => navigate(`/home/${id}`)}
-                        type="button"
-                        sx={{ mt: 2 }}
-                    >
-                        Volver
-                    </Button>
                 </Grid>
             </Box>
-            <h4>Dependiendo del tipo de préstamo cambiará el monto máximo que puedas solicitar</h4>
         </div>
     );
 };

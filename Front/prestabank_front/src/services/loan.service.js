@@ -4,10 +4,30 @@ const getAll = () => {
     return httpClient.get('/api/loan/');
 }
 
-const create = data => {
-    return httpClient.post("/api/loan/", data);
+const create = (loan, file) => {
+    const formData = new FormData();
+    // Agregar el objeto LoanEntity como una cadena JSON directamente
+    formData.append("loan", JSON.stringify(loan));
+    // Agregar el archivo
+    formData.append("file", file);
+
+    // Al usar FormData, el navegador se encarga de los encabezados (Content-Type), por lo que no debes definirlos manualmente.
+    console.log("----DATOS QUE SE MANDARAN AL BACKEND----");
+    console.log(formData.get("loan"));
+    console.log(formData.get("file"));
+
+    // Configuración explícita para axios
+    const config = {
+        headers: {
+            'Content-Type': 'multipart/form-data', // Asegúrate de que se mande como multipart
+        }
+    };
+
+    return httpClient.post("/api/loan/", formData, config);
 }
 
+
+  
 const get = id =>  {
     return httpClient.get(`/api/loan/${id}`);
 }

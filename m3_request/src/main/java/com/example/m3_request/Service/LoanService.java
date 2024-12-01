@@ -8,6 +8,7 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+import java.io.IOException;
 import java.time.LocalDate;
 import java.time.Period;
 
@@ -17,6 +18,7 @@ import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.web.multipart.MultipartFile;
 
 
 @Service
@@ -42,7 +44,19 @@ public class LoanService {
     }
 
     //Guardar un prestamo todo bien
-    public LoanEntity saveLoan(LoanEntity saveLoan) {
+    public LoanEntity saveLoan(LoanEntity saveLoan, MultipartFile file) {
+
+        try {
+            if (file != null && !file.isEmpty()) {
+                saveLoan.setPdfContent(file.getBytes());  // Guarda el contenido del PDF
+            } else {
+                saveLoan.setPdfContent(null);  // Deja espacio para agregar el PDF más tarde
+            }
+        } catch (IOException e) {
+            saveLoan.setPdfContent(null);  // Establece null si ocurre un error
+            logger.info("--Fallo al guardar el PDF");
+            System.err.println("Error al procesar el archivo PDF: " + e.getMessage());
+        }
 
         String urlInsurance = "http://TOTALCOST/api/totalcost/insurance?loanAmount=" + saveLoan.getLoanAmount();
         ResponseEntity<Double> response = restTemplateConfig.restTemplate().getForEntity(urlInsurance, Double.class);

@@ -38,12 +38,14 @@ public class LoanEntity {
 
     private ArrayList<Integer> saving; //   Puntos de capacidad de ahorro
 
-    private ArrayList<String> papers; //Se agrega- Documentacion a evaluar manualmente
+    @Lob
+    @Column(name = "papers")
+    private byte[] papers;  //Se agrega- Documentacion a evaluar manualmente Almacena el archivo PDF
 
     private ArrayList<Integer> evalue; //   Listado que indica automaticamente las cosas 0=rechazado, 1=aprobado, 2=pendiente. 3=Requiere otra revision [R1, R2, R3, R4, R6, R7]
 
 
-    public LoanEntity(Long idUser, int type, double yearInterest, int maxDuration, int maxLoan, int income, int veteran, int totaldebt, double monthlyPayment, double loanAmount, double monthlyInteresRate, int totalPayments, double ingesurce, double commission, double totalCost, int isIndependent, ArrayList<Integer> saving, ArrayList<String> papers, ArrayList<Integer> evalue) {
+    public LoanEntity(Long idUser, int type, double yearInterest, int maxDuration, int maxLoan, int income, int veteran, int totaldebt, double monthlyPayment, double loanAmount, double monthlyInteresRate, int totalPayments, double ingesurce, double commission, double totalCost, int isIndependent, ArrayList<Integer> saving, byte[] papers, ArrayList<Integer> evalue) {
         this.idUser = idUser;
         this.status = 1;
         this.type = type;
@@ -126,7 +128,7 @@ public class LoanEntity {
         this.saving = saving;
     }
 
-    public void setPapers(ArrayList<String> papers) {
+    public void setPdfContent(byte[] papers) {
         this.papers = papers;
     }
 
@@ -143,6 +145,7 @@ public class LoanEntity {
     public void setCommission(double commission) {this.commission = commission;}
 
     public void setIngesurce(double ingesurce) {this.ingesurce = ingesurce;}
+
 }
 
 

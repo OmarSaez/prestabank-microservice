@@ -2,6 +2,7 @@ package com.example.m3_request.Controller;
 
 import com.example.m3_request.Entity.LoanEntity;
 import com.example.m3_request.Service.LoanService;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -11,6 +12,10 @@ import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.web.multipart.MultipartFile;
+
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 @RestController
 @RequestMapping("/api/loan")
@@ -43,10 +48,22 @@ public class LoanController {
 
     //URL guardar un prestamo
     @PostMapping("/")
-    public ResponseEntity<LoanEntity> saveLoan(@RequestBody LoanEntity loan){
-        logger.info("--Interes anual al entrar PostMapping: {}", loan.getYearInterest());
-        LoanEntity newLoan = loanService.saveLoan(loan);
-        return ResponseEntity.ok(newLoan);
+    public ResponseEntity<LoanEntity> saveLoan(@RequestParam("loan") String loanJson,
+                                               @RequestParam("file") MultipartFile file) {
+        try {
+            // Deserializa el JSON manualmente
+            ObjectMapper objectMapper = new ObjectMapper();
+            LoanEntity loan = objectMapper.readValue(loanJson, LoanEntity.class);
+
+            logger.info("Datos del préstamo: " + loan);
+            logger.info("Archivo recibido: " + file.getOriginalFilename());
+
+            LoanEntity savedLoan = loanService.saveLoan(loan, file);
+            return ResponseEntity.ok(savedLoan);
+        } catch (Exception e) {
+            logger.error("Error al guardar el préstamo: " + e.getMessage());
+            return ResponseEntity.status(500).body(null);
+        }
     }
 
     //URL actualizar un prestamo
