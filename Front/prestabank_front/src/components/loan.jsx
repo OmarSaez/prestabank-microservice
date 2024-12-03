@@ -194,6 +194,57 @@ const Loan = () => {
             });
     };
 
+      // Función para descargar el PDF en Base64
+      const downloadPDFBase64 = (base64Data, fileName = 'documento.pdf') => {
+        if (!base64Data || typeof base64Data !== 'string') {
+          console.error("Datos inválidos para descargar el PDF.");
+          return;
+        }
+      
+        try {
+          // Convertir Base64 a un array de bytes
+          const byteCharacters = atob(base64Data);
+          const byteNumbers = new Array(byteCharacters.length);
+          for (let i = 0; i < byteCharacters.length; i++) {
+            byteNumbers[i] = byteCharacters.charCodeAt(i);
+          }
+      
+          const byteArray = new Uint8Array(byteNumbers);
+          const blob = new Blob([byteArray], { type: 'application/pdf' });
+          const url = URL.createObjectURL(blob);
+      
+          const a = document.createElement('a');
+          a.href = url;
+          a.download = fileName;
+          document.body.appendChild(a);
+          a.click();
+      
+          document.body.removeChild(a);
+          URL.revokeObjectURL(url);
+        } catch (error) {
+          console.error("Error al procesar el PDF para descarga:", error);
+        }
+      };
+      
+
+  // Función para obtener y descargar el PDF
+  const handleDownloadPDF = () => {
+    loanService.getForPDF(idLoan)
+      .then(response => {
+        if (response.data) {
+          console.log("PDF en Base64 recibido:", response.data); // Verifica el contenido recibido
+          downloadPDFBase64(response.data, 'documento.pdf');
+        } else {
+          console.error("Respuesta vacía del servidor.");
+        }
+      })
+      .catch(error => {
+        console.error("Error descargando el PDF:", error);
+      });
+  };
+  
+    
+
 
     return (
         <div>
@@ -405,6 +456,18 @@ const Loan = () => {
                 </Grid>
             ))}
             </Grid>
+
+            <div>
+              {/* Descargar PDF*/}
+              
+              <Card>
+                <CardContent>
+                  <Typography variant="h6">Documento Adjunto</Typography>
+                  {/* Botón para descargar el PDF */}
+                    <Button variant="contained" onClick={handleDownloadPDF}>Descargar PDF</Button>
+                </CardContent>
+              </Card>
+            </div>
 
       
           {/* Botones */}

@@ -8,6 +8,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
+import java.util.Base64;
 import java.util.List;
 
 import org.slf4j.Logger;
@@ -38,6 +39,26 @@ public class LoanController {
         LoanEntity loan = loanService.getLoanById(id);
         return ResponseEntity.ok(loan);
     }
+
+
+    @GetMapping("/{id}/pdf")
+    public ResponseEntity<String> getLoanPdfBase64(@PathVariable Long id) {
+        logger.info("--Se logro entrar a la URL /loan/{id}/pdf");
+        LoanEntity loan = loanService.getLoanById(id);  // Obtén el préstamo
+        byte[] pdfContent = loan.getPapers();        // Contenido binario del PDF
+
+        if (pdfContent == null) {
+            logger.error("--No se encontro le archivo PDF");
+            return ResponseEntity.status(404).body("Archivo no encontrado");
+        }
+
+        // Codificar en Base64
+        String base64Pdf = Base64.getEncoder().encodeToString(pdfContent);
+        logger.info("--Se encontro el PDF y se codifico en 64");
+
+        return ResponseEntity.ok(base64Pdf);
+    }
+
 
     //URl rescatar todos los loan por el ID del USER
     @GetMapping("/user/{idUser}")

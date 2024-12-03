@@ -32,6 +32,10 @@ const get = id =>  {
     return httpClient.get(`/api/loan/${id}`);
 }
 
+const getForPDF = id => {
+    return httpClient.get(`/api/loan/${id}/pdf`);
+}
+
 const getAllWithID = id => {
     return httpClient.get(`/api/loan/user/${id}`);
 }
@@ -68,4 +72,4 @@ const simulateLoan = (loanData) => {
 }
 
 
-export default { getAll, create, get, getAllWithID, update, remove, status, type, updateExecutive, simulateLoan };
+export default { getAll, create, get, getForPDF, getAllWithID, update, remove, status, type, updateExecutive, simulateLoan };
