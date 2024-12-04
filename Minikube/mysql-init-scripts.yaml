@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: mysql-init-scripts
+data:
+  init.sql: |
+    CREATE DATABASE IF NOT EXISTS simulation;
+    CREATE DATABASE IF NOT EXISTS user;
+    CREATE DATABASE IF NOT EXISTS loan;
+    CREATE DATABASE IF NOT EXISTS evaluation;
+    CREATE DATABASE IF NOT EXISTS follow;
+    CREATE DATABASE IF NOT EXISTS totalcost;

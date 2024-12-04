@@ -1,0 +1,7 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: mysql-config-M3
+data:
+  host: mysql
+  name: loan

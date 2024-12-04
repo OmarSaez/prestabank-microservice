@@ -1,0 +1,55 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mysql
+  labels:
+    app: mysql
+spec:
+  selector:
+    matchLabels:
+      app: mysql
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: mysql
+    spec:
+      containers:
+        - image: mysql:latest
+          name: mysql
+          env:
+            - name: MYSQL_ROOT_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: mysql-root-credentials  # Referencia al Secret donde está la contraseña root
+                  key: password
+            - name: MYSQL_DATABASE
+              valueFrom:
+                configMapKeyRef:
+                  name: mysql-db  # ConfigMap para el nombre de la base de datos
+                  key: name
+          ports:
+            - containerPort: 3306
+              name: mysql
+          volumeMounts:
+            - name: mysql-init-scripts
+              mountPath: /docker-entrypoint-initdb.d  # MySQL ejecutará automáticamente los scripts en esta carpeta
+      volumes:
+        - name: mysql-init-scripts
+          configMap:
+            name: mysql-init-scripts  # Este es el nombre del ConfigMap que contiene el script SQL
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: mysql
+  labels:
+    app: mysql
+spec:
+  ports:
+    - port: 3306
+      targetPort: 3306
+  selector:
+    app: mysql
+  clusterIP: None  # Esto permite que otros servicios puedan conectarse sin una IP fija

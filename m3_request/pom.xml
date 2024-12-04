@@ -107,6 +107,7 @@
 				</configuration>
 			</plugin>
 		</plugins>
+		<finalName>m3-request</finalName>
 	</build>
 
 </project>

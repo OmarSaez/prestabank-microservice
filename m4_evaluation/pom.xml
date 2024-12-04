@@ -101,6 +101,7 @@
 				</configuration>
 			</plugin>
 		</plugins>
+		<finalName>m4-evaluation</finalName>
 	</build>
 
 </project>

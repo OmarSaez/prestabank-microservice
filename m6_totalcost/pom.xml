@@ -101,6 +101,7 @@
 				</configuration>
 			</plugin>
 		</plugins>
+		<finalName>m6-totalcost</finalName>
 	</build>
 
 </project>

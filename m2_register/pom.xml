@@ -102,6 +102,7 @@
 				</configuration>
 			</plugin>
 		</plugins>
+		<finalName>m2-register</finalName>
 	</build>
 
 </project>

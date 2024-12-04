@@ -1,0 +1,36 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: eureka-deployment
+  labels:
+    app: eureka-deployment   # Cambié de 'apps' a 'app' para consistencia
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: eureka-deployment  # Coincide con el Service
+  template:
+    metadata:
+      labels:
+        app: eureka-deployment  # Coincide con el selector
+    spec:
+      containers:
+        - name: eureka-service  # Nombre descriptivo del contenedor
+          image: omarsaez/eureka-service:latest
+          ports:
+            - containerPort: 8761  # Es el puerto en el que el contenedor escucha dentro del Pod. Esto coincide con el puerto definido en tu código
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: eureka-service  # Un nombre único para el Service
+  labels:
+    app: eureka-deployment  # Coincide con el Deployment
+spec:
+  selector:
+    app: eureka-deployment  # Debe coincidir con las etiquetas del Deployment
+  ports:
+    - protocol: TCP
+      port: 8761            # Es el puerto que expone el Service dentro del clúster Kubernetes. Los demás microservicios usan este puerto para comunicarse.
+      targetPort: 8761      # Es el puerto interno del Pod al que el Service enviará las solicitudes. Debe coincidir con el containerPort.
+  type: ClusterIP          # Comunicación interna (no expone a fuera del clúster)

@@ -1,0 +1,71 @@
+---------Crear imágenes en docker-----------
+
+--back
+
+docker build -t omarsaez/config-service:latest .
+
+docker build -t omarsaez/eureka-service:latest .
+
+docker build -t omarsaez/api-gateway:latest .
+
+docker build -t omarsaez/m1-simulation:latest .
+
+docker build -t omarsaez/m2-register:latest .
+
+docker build -t omarsaez/m3-request:latest .
+
+docker build -t omarsaez/m4-evaluation:latest .
+
+docker build -t omarsaez/m5-follow:latest .
+
+docker build -t omarsaez/m6-totalcost:latest .
+
+--front
+
+docker build -t omarsaez/frontend-microsevicio:latest .
+
+----------Subir imagen-----------
+
+--back
+
+docker push omarsaez/config-service:latest
+
+docker push omarsaez/eureka-service:latest
+
+docker push omarsaez/api-gateway:latest
+
+docker push omarsaez/m1-simulation:latest
+
+docker push omarsaez/m2-register:latest
+
+docker push omarsaez/m3-request:latest
+
+docker push omarsaez/m4-evaluation:latest
+
+docker push omarsaez/m5-follow:latest
+
+docker push omarsaez/m6-totalcost:latest
+
+
+--front
+
+docker push omarsaez/frontend-microsevicio:latest
+
+---------Subir imagenes automatico------
+
+1-Abrir git bash
+
+2- ingresas a la ruta:
+
+cd /c/Users/omaez/Desktop/Codigos/Tingeso/Microservicios/prestabank-microservice
+
+3- Dar permisos:
+
+chmod +x push-all-images.sh
+
+4- Ejercutar:
+
+./push-all-images.sh
+
+Nota: Recuerden logearse dentro de git bash y no hace falta git bash si usan linux
+

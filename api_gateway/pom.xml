@@ -74,5 +74,6 @@
 				<artifactId>spring-boot-maven-plugin</artifactId>
 			</plugin>
 		</plugins>
+		<finalName>api-gateway</finalName>
 	</build>
 </project>

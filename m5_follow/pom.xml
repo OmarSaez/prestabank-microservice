@@ -95,6 +95,7 @@
 				</configuration>
 			</plugin>
 		</plugins>
+		<finalName>m5-follow</finalName>
 	</build>
 
 </project>
