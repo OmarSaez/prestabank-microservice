@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
         - name: m2-register
-          image: mtisw/m2-register:latest
+          image: omarsaez/m2-register:latest
           ports:
             - containerPort: 8002
           env:

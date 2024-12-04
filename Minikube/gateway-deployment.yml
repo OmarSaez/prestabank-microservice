@@ -33,4 +33,6 @@ spec:
     - protocol: TCP
       port: 8050            # Es el puerto que expone el Service dentro del clúster Kubernetes. Los demás microservicios usan este puerto para comunicarse.
       targetPort: 8050      # Es el puerto interno del Pod al que el Service enviará las solicitudes. Debe coincidir con el containerPort.
-  type: ClusterIP          # Comunicación interna (no expone a fuera del clúster)
+      nodePort: 30002     # Puerto en el nodo para acceder desde fuera del clúster
+      #Para que funcione, el valor de nodePort debe estar entre 30000 y 32767.
+  type: NodePort          # Comunicación interna (no expone a fuera del clúster)

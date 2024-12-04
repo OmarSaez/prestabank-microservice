@@ -24,11 +24,6 @@ spec:
                 secretKeyRef:
                   name: mysql-root-credentials  # Referencia al Secret donde está la contraseña root
                   key: password
-            - name: MYSQL_DATABASE
-              valueFrom:
-                configMapKeyRef:
-                  name: mysql-db  # ConfigMap para el nombre de la base de datos
-                  key: name
           ports:
             - containerPort: 3306
               name: mysql

@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
         - name: m1-simulation
-          image: mtisw/m1-simulation:latest
+          image: omarsaez/m1-simulation:latest
           ports:
             - containerPort: 8001
           env:

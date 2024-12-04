@@ -1,0 +1,94 @@
+Habilitar para docker:
+
+bcdedit /set hypervisorlaunchtype auto
+
+después reinciar el pc
+
+verificar estado: bcdedit
+
+-----
+
+---Como instalar minikube---
+
+--Abre PowerShell como Administrador y ejecuta:
+powershell
+Copiar código:
+New-Item -Path 'C:\' -Name 'minikube' -ItemType Directory -Force
+
+--Descargar el ejecutable de Minikube
+
+Descarga y guarda el archivo .exe en la carpeta creada:
+powershell
+Este proceso puede tardar hasta 6 minutos donde la powershall no respondera a nada, solo hay que esperar hasta que arroje que a cabo
+Copiar código:
+Invoke-WebRequest -OutFile 'C:\minikube\minikube.exe' -Uri 'https://github.com/kubernetes/minikube/releases/latest/download/minikube-windows-amd64.exe' -UseBasicParsing
+
+--Agregar Minikube a la variable de entorno PATH
+
+Esto permite ejecutar minikube desde cualquier ubicación en la terminal:
+powershell
+Copiar código
+$oldPath = [Environment]::GetEnvironmentVariable('Path', [EnvironmentVariableTarget]::Machine)
+if ($oldPath.Split(';') -inotcontains 'C:\minikube'){
+  [Environment]::SetEnvironmentVariable('Path', $('{0};C:\minikube' -f $oldPath), [EnvironmentVariableTarget]::Machine)
+}
+
+
+-------------------------------------------
+------Que hacer para iniciar minikube-------
+
+Desactivar hypervisor:
+
+bcdedit /set hypervisorlaunchtype off
+
+
+reiniciar el pc 
+
+verificar estado: bcdedit
+
+una ves abra virutal box, en una powershell en administrador
+
+ruta:
+cd "C:\Users\omaez\Desktop\Codigos\Tingeso\Microservicios\prestabank-microservice\Minikube"
+
+minikube start --driver=virtualbox --memory=6144
+
+
+Verificar que funcione el nodo principal
+
+kubectl cluster-info
+
+kubectl get nodes
+
+kubectl get pod
+
+kubectl get service
+
+kubectl get deployment
+
+----y ya debería estar todo listo para levantar pods
+
+levantar front:
+
+kubectl apply -f front-deployment.yml
+
+kubectl apply -f config-deployment.yml
+
+kubectl apply -f eureka-deployment.yml
+
+kubectl apply -f gateway-deployment.yml
+
+kubectl apply -f mysql-init-scripts.yaml
+
+kubectl apply -f mysq-root-secret.yml
+
+kubectl apply -f mysql-deployment.yml
+
+kubectl apply -f mysq-M1-configmap.yml
+
+kubectl apply -f m1-deployment.yml
+
+kubectl apply -f mysq-M2-configmap.yml
+
+kubectl apply -f m2-deployment.yml
+
