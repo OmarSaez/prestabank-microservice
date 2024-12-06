@@ -14,6 +14,19 @@ spring:
       discovery:
         locator:
           enabled: true
+      httpclient:
+        connect-timeout: 5000
+        response-timeout: 10000
+
+      default-filters:
+        - DedupeResponseHeader=Access-Control-Allow-Origin Access-Control-Allow-Credentials, RETAIN_UNIQUE
+
+      globalcors:
+        cors-configurations:
+          '[/**]':
+            allowedOrigins: '*'
+            allowedMethods: "*"
+            allowedHeaders: "*"
       routes:
         - id: m1_simulation_router
           uri: lb://SIMULATION
@@ -41,15 +54,5 @@ spring:
           predicates:
             - Path=/api/totalcost/**
 
-      httpclient:
-        connect-timeout: 5000
-        response-timeout: 10000
-
-      globalcors:
-        cors-configurations:
-          '[/**]':
-            allowedOrigins: "http://front-deployment:5173"
-            allowedMethods: "*"
-            allowedHeaders: "*"
-            allowCredentials: true
+      
 

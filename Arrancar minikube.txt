@@ -71,15 +71,13 @@ kubectl get deployment
 
 levantar front:
 
+kubectl apply -f eureka-deployment.yml -f config-deployment.yml -f front-deployment.yml -f mysql-init-scripts.yaml -f mysq-root-secret.yml -f mysql-deployment.yml -f mysq-M1-configmap.yml -f mysq-M2-configmap.yml -f m1-deployment.yml m2-deployment.yml
+
 kubectl apply -f front-deployment.yml
 
 kubectl apply -f config-deployment.yml
 
 kubectl apply -f eureka-deployment.yml
-
-kubectl apply -f gateway-deployment.yml
-
---
 
 kubectl apply -f mysql-init-scripts.yaml
 
@@ -93,14 +91,13 @@ kubectl apply -f mysq-M2-configmap.yml
 
 --
 
-kubectl apply -f m1-deployment.yml
+kubectl apply -f gateway-deployment.yml
 
-kubectl apply -f m1-service.yml
+kubectl apply -f m1-deployment.yml
 -
 
 kubectl apply -f m2-deployment.yml
 
-kubectl apply -f m2-service.yml
 
 ---Como cambiar numero de replicas:
 
@@ -117,5 +114,15 @@ kubectl port-forward gateway-deployment-64658cc76d-p4pg2 8050:8050
 ---Monitoreo
 
 minikube dashboard
+
+---Ver logs
+
+kubectl logs -f <nombre-del-pod>
+
+--- ir a la pagina
+
+minikube service front-service
+
+
 
 

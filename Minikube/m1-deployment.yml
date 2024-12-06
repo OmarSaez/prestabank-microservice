@@ -18,8 +18,14 @@ spec:
         - name: m1-simulation
           image: omarsaez/m1-simulation:latest
           ports:
-            - containerPort: 8001
+            - containerPort: 8061  # Puerto fijo del contenedor (debe coincidir con el configurado por defecto en tu aplicación)
           env:
+            - name: SERVER_PORT
+              value: "0"  # Puerto aleatorio
+            - name: HOSTNAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: status.podIP
             - name: DB_HOST
               valueFrom:
                 configMapKeyRef:
