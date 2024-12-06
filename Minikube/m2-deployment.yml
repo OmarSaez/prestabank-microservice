@@ -8,7 +8,7 @@ spec:
   selector:
     matchLabels:
       app: m2-register
-  replicas: 2
+  replicas: 1
   template:
     metadata:
       labels:
@@ -18,8 +18,14 @@ spec:
         - name: m2-register
           image: omarsaez/m2-register:latest
           ports:
-            - containerPort: 8002
+            - containerPort: 8060  # Puerto fijo del contenedor (debe coincidir con el configurado por defecto en tu aplicación)
           env:
+            - name: SERVER_PORT
+              value: "0"  # Puerto aleatorio
+            - name: HOSTNAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: status.podIP
             - name: DB_HOST
               valueFrom:
                 configMapKeyRef:
@@ -37,3 +43,5 @@ spec:
                 secretKeyRef:
                   name: mysql-root-credentials  # El secret que contiene la contraseña root
                   key: password
+
+

@@ -5,10 +5,10 @@ metadata:
   labels:
     app: gateway-deployment   # Cambié de 'apps' a 'app' para consistencia
 spec:
-  replicas: 2
   selector:
     matchLabels:
       app: gateway-deployment  # Coincide con el Service
+  replicas: 1
   template:
     metadata:
       labels:
@@ -23,7 +23,7 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: gateway-service  # Un nombre único para el Service
+  name: gatewayservice  # Un nombre único para el Service
   labels:
     app: gateway-deployment  # Coincide con el Deployment
 spec:
@@ -33,6 +33,6 @@ spec:
     - protocol: TCP
       port: 8050            # Es el puerto que expone el Service dentro del clúster Kubernetes. Los demás microservicios usan este puerto para comunicarse.
       targetPort: 8050      # Es el puerto interno del Pod al que el Service enviará las solicitudes. Debe coincidir con el containerPort.
-      nodePort: 30002     # Puerto en el nodo para acceder desde fuera del clúster
-      #Para que funcione, el valor de nodePort debe estar entre 30000 y 32767.
-  type: NodePort          # Comunicación interna (no expone a fuera del clúster)
+  type: ClusterIP          # Comunicación interna (no expone a fuera del clúster)
+
+

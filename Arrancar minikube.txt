@@ -48,10 +48,11 @@ verificar estado: bcdedit
 
 una ves abra virutal box, en una powershell en administrador
 
-ruta:
+---ruta:
+
 cd "C:\Users\omaez\Desktop\Codigos\Tingeso\Microservicios\prestabank-microservice\Minikube"
 
-minikube start --driver=virtualbox --memory=6144
+minikube start --driver=virtualbox --memory=6000
 
 
 Verificar que funcione el nodo principal
@@ -78,6 +79,8 @@ kubectl apply -f eureka-deployment.yml
 
 kubectl apply -f gateway-deployment.yml
 
+--
+
 kubectl apply -f mysql-init-scripts.yaml
 
 kubectl apply -f mysq-root-secret.yml
@@ -86,9 +89,33 @@ kubectl apply -f mysql-deployment.yml
 
 kubectl apply -f mysq-M1-configmap.yml
 
-kubectl apply -f m1-deployment.yml
-
 kubectl apply -f mysq-M2-configmap.yml
 
+--
+
+kubectl apply -f m1-deployment.yml
+
+kubectl apply -f m1-service.yml
+-
+
 kubectl apply -f m2-deployment.yml
+
+kubectl apply -f m2-service.yml
+
+---Como cambiar numero de replicas:
+
+kubectl scale deployment/front-deployment --replicas=1
+
+---Verificar espacios
+
+kubectl get all --all-namespaces
+
+---Abrir un puerto hacia local
+
+kubectl port-forward gateway-deployment-64658cc76d-p4pg2 8050:8050
+
+---Monitoreo
+
+minikube dashboard
+
 

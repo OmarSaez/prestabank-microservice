@@ -5,10 +5,10 @@ metadata:
   labels:
     app: eureka-deployment   # Cambié de 'apps' a 'app' para consistencia
 spec:
-  replicas: 2
   selector:
     matchLabels:
       app: eureka-deployment  # Coincide con el Service
+  replicas: 1
   template:
     metadata:
       labels:
