@@ -1,7 +1,7 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: mysql-config-M6
+  name: mysql-config-m6
 data:
   host: mysql
   name: totalcost

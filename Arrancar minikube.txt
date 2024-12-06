@@ -73,7 +73,9 @@ levantar front:
 
 cd "C:\Users\omaez\Desktop\Codigos\Tingeso\Microservicios\prestabank-microservice\Minikube"
 
-kubectl apply -f eureka-deployment.yml -f config-deployment.yml -f front-deployment.yml -f mysql-init-scripts.yaml -f mysq-root-secret.yml -f mysql-deployment.yml -f mysq-M1-configmap.yml -f mysq-M2-configmap.yml -f m1-deployment.yml -f m2-deployment.yml
+kubectl apply -f front-deployment.yml || true; kubectl apply -f config-deployment.yml || true; kubectl apply -f eureka-deployment.yml || true; kubectl apply -f mysql-init-scripts.yaml || true; kubectl apply -f mysq-root-secret.yml || true; kubectl apply -f mysql-deployment.yml || true; kubectl apply -f mysq-M1-configmap.yml || true; kubectl apply -f mysq-M2-configmap.yml || true; kubectl apply -f mysq-M3-configmap.yml || true; kubectl apply -f mysq-M4-configmap.yml || true; kubectl apply -f mysq-M5-configmap.yml || true; kubectl apply -f mysq-M6-configmap.yml || true; kubectl apply -f m1-deployment.yml || true; kubectl apply -f m2-deployment.yml || true; kubectl apply -f m3-deployment.yml || true; kubectl apply -f m4-deployment.yml || true; kubectl apply -f m5-deployment.yml || true; kubectl apply -f m6-deployment.yml || true; kubectl apply -f gateway-deployment.yml || true
+
+
 
 kubectl apply -f front-deployment.yml
 
@@ -91,13 +93,29 @@ kubectl apply -f mysq-M1-configmap.yml
 
 kubectl apply -f mysq-M2-configmap.yml
 
+kubectl apply -f mysq-M3-configmap.yml
+
+kubectl apply -f mysq-M4-configmap.yml
+
+kubectl apply -f mysq-M5-configmap.yml
+
+kubectl apply -f mysq-M6-configmap.yml
+
 kubectl apply -f m1-deployment.yml
 
 kubectl apply -f m2-deployment.yml
 
----
+kubectl apply -f m3-deployment.yml
+
+kubectl apply -f m4-deployment.yml
+
+kubectl apply -f m5-deployment.yml
+
+kubectl apply -f m6-deployment.yml
 
 kubectl apply -f gateway-deployment.yml
+
+---
 
 
 ---Como cambiar numero de replicas:

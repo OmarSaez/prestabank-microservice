@@ -1,7 +1,7 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: mysql-config-M4
+  name: mysql-config-m4
 data:
   host: mysql
   name: evaluation
