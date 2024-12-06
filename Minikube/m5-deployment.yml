@@ -1,24 +1,24 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: m2-register
+  name: m5-follow
   labels:
-    app: m2-register
+    app: m5-follow
 spec:
   selector:
     matchLabels:
-      app: m2-register
+      app: m5-follow
   replicas: 2
   template:
     metadata:
       labels:
-        app: m2-register
+        app: m5-follow
     spec:
       containers:
-        - name: m2-register
-          image: omarsaez/m2-register:latest
+        - name: m5-follow
+          image: omarsaez/m5-follow:latest
           ports:
-            - containerPort: 8062  # Puerto fijo del contenedor (debe coincidir con el configurado por defecto en tu aplicación)
+            - containerPort: 8065  # Puerto fijo del contenedor (debe coincidir con el configurado por defecto en tu aplicación)
           env:
             - name: SERVER_PORT
               value: "0"  # Puerto aleatorio
@@ -29,12 +29,12 @@ spec:
             - name: DB_HOST
               valueFrom:
                 configMapKeyRef:
-                  name: mysql-config-m2  # ConfigMap para el host y el nombre de la base de datos
+                  name: mysql-config-m5  # ConfigMap para el host y el nombre de la base de datos
                   key: host
             - name: DB_NAME
               valueFrom:
                 configMapKeyRef:
-                  name: mysql-config-m2  # ConfigMap para el nombre de la base de datos
+                  name: mysql-config-m5  # ConfigMap para el nombre de la base de datos
                   key: name
             - name: DB_USERNAME
               value: root  # Usuario root directamente
