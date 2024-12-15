@@ -67,13 +67,15 @@ kubectl get service
 
 kubectl get deployment
 
+kubectl get configmap
+
 ----y ya debería estar todo listo para levantar pods
 
-levantar front:
+levantar pods:
 
 cd "C:\Users\omaez\Desktop\Codigos\Tingeso\Microservicios\prestabank-microservice\Minikube"
 
-kubectl apply -f front-deployment.yml || true; kubectl apply -f config-deployment.yml || true; kubectl apply -f eureka-deployment.yml || true; kubectl apply -f mysql-init-scripts.yaml || true; kubectl apply -f mysq-root-secret.yml || true; kubectl apply -f mysql-deployment.yml || true; kubectl apply -f mysq-M1-configmap.yml || true; kubectl apply -f mysq-M2-configmap.yml || true; kubectl apply -f mysq-M3-configmap.yml || true; kubectl apply -f mysq-M4-configmap.yml || true; kubectl apply -f mysq-M5-configmap.yml || true; kubectl apply -f mysq-M6-configmap.yml || true; kubectl apply -f m1-deployment.yml || true; kubectl apply -f m2-deployment.yml || true; kubectl apply -f m3-deployment.yml || true; kubectl apply -f m4-deployment.yml || true; kubectl apply -f m5-deployment.yml || true; kubectl apply -f m6-deployment.yml || true; kubectl apply -f gateway-deployment.yml || true
+kubectl apply -f front-deployment.yml; kubectl apply -f config-deployment.yml; kubectl apply -f eureka-deployment.yml; kubectl apply -f mysql-init-scripts.yaml; kubectl apply -f mysq-root-secret.yml; kubectl apply -f mysql-deployment.yml; kubectl apply -f mysq-M1-configmap.yml; kubectl apply -f mysq-M2-configmap.yml; kubectl apply -f mysq-M3-configmap.yml; kubectl apply -f mysq-M4-configmap.yml; kubectl apply -f mysq-M5-configmap.yml; kubectl apply -f mysq-M6-configmap.yml; kubectl apply -f m1-deployment.yml; kubectl apply -f m2-deployment.yml; kubectl apply -f m3-deployment.yml; kubectl apply -f m4-deployment.yml; kubectl apply -f m5-deployment.yml; kubectl apply -f m6-deployment.yml; kubectl apply -f gateway-deployment.yml
 
 
 
@@ -141,6 +143,11 @@ kubectl logs -f <nombre-del-pod>
 --- ir a la pagina
 
 minikube service front-service
+
+--- Eliminar un pod
+
+kubectl delete pod config-deployment-5d8d5c7446-56td9
+
 
 
 
